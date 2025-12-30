@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Serene Tea — Menu</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1>Tea  Time</h1>
+      <p class="tagline">Handcrafted teas & small snacks</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="controls">
+      <input id="search" type="search" placeholder="Search teas or snacks..." aria-label="Search menu" />
+      <div class="filters" role="tablist" aria-label="Filter categories">
+        <button class="filter active" data-cat="all">All</button>
+        <button class="filter" data-cat="hot">Hot Teas</button>
+        <button class="filter" data-cat="iced">Iced Teas</button>
+        <button class="filter" data-cat="snack">Snacks</button>
+      </div>
+    </section>
+
+    <section id="menu" class="menu-grid" aria-live="polite">
+
+      <div class="menu-item" data-cat="hot">
+        <img src="https://images.unsplash.com/photo-1523983254028-72d3d65b1d6a?auto=format&fit=crop&w=800&q=60" alt="Masala Chai in cup" />
+        <div class="info">
+          <h3>Masala Chai</h3>
+          <p>Black tea steeped with warming spices and milk.</p>
+          <div class="meta"><span class="price">$3.50</span><span class="badge">Hot</span></div>
+        </div>
+      </div>
+
+      <div class="menu-item" data-cat="hot">
+        <img src="https://images.unsplash.com/photo-1526318472351-c75fcf07026c?auto=format&fit=crop&w=800&q=60" alt="Earl Grey"/>
+        <div class="info">
+          <h3>Earl Grey</h3>
+          <p>Classic black tea scented with bergamot for citrusy notes.</p>
+          <div class="meta"><span class="price">$3.00</span><span class="badge">Hot</span></div>
+        </div>
+      </div>
+
+      <div class="menu-item" data-cat="hot">
+        <img src="https://images.unsplash.com/photo-1518882573560-8f5341b30c5d?auto=format&fit=crop&w=800&q=60" alt="Matcha latte"/>
+        <div class="info">
+          <h3>Matcha Latte</h3>
+          <p>Ceremonial-grade matcha whisked with steamed milk.</p>
+          <div class="meta"><span class="price">$4.50</span><span class="badge">Hot</span></div>
+        </div>
+      </div>
+
+      <div class="menu-item" data-cat="iced">
+        <img src="https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=800&q=60" alt="Iced lemon tea"/>
+        <div class="info">
+          <h3>Iced Lemon Tea</h3>
+          <p>Refreshing black tea with a splash of lemon and ice.</p>
+          <div class="meta"><span class="price">$3.25</span><span class="badge">Iced</span></div>
+        </div>
+      </div>
+
+      <div class="menu-item" data-cat="iced">
+        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=60" alt="Iced matcha"/>
+        <div class="info">
+          <h3>Iced Matcha</h3>
+          <p>Cold, creamy matcha over ice.</p>
+          <div class="meta"><span class="price">$4.75</span><span class="badge">Iced</span></div>
+        </div>
+      </div>
+
+      <div class="menu-item" data-cat="snack">
+        <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=800&q=60" alt="Butter cookie"/>
+        <div class="info">
+          <h3>Buttery Shortbread</h3>
+          <p>House-baked, crisp shortbread with vanilla.</p>
+          <div class="meta"><span class="price">$2.75</span><span class="badge">Snack</span></div>
+        </div>
+      </div>
+
+      <div class="menu-item" data-cat="snack">
+        <img src="https://images.unsplash.com/photo-1604908177522-8b16f2c1f4f8?auto=format&fit=crop&w=800&q=60" alt="Scone"/>
+        <div class="info">
+          <h3>Blueberry Scone</h3>
+          <p>Light, flaky scone packed with blueberries.</p>
+          <div class="meta"><span class="price">$3.00</span><span class="badge">Snack</span></div>
+        </div>
+      </div>
+
+      <div class="menu-item" data-cat="hot">
+        <img src="https://images.unsplash.com/photo-1528821154947-1aa3e4d3d6d0?auto=format&fit=crop&w=800&q=60" alt="Herbal infusion"/>
+        <div class="info">
+          <h3>Chamomile</h3>
+          <p>Calming herbal infusion, naturally caffeine-free.</p>
+          <div class="meta"><span class="price">$3.00</span><span class="badge">Hot</span></div>
+        </div>
+      </div>
+
+    </section>
+
+    <p class="footer">Open daily • 8am – 6pm • 123 Tea Lane</p>
+
+  </main>
+
+  <script>
+    // Simple client-side filter + search
+    const filters = document.querySelectorAll('.filter');
+    const items = Array.from(document.querySelectorAll('.menu-item'));
+    const search = document.getElementById('search');
+
+    function applyFilter(category, query=''){
+      const q = query.trim().toLowerCase();
+      items.forEach(it=>{
+        const matchesCat = category === 'all' || it.dataset.cat === category;
+        const text = (it.querySelector('h3').textContent + ' ' + it.querySelector('p').textContent).toLowerCase();
+        const matchesQuery = q === '' || text.includes(q);
+        it.style.display = (matchesCat && matchesQuery) ? '' : 'none';
+      });
+    }
+
+    filters.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        filters.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        applyFilter(btn.dataset.cat, search.value);
+      });
+    });
+
+    search.addEventListener('input', ()=>{
+      const active = document.querySelector('.filter.active').dataset.cat;
+      applyFilter(active, search.value);
+    });
+
+    // keyboard accessibility for filters
+    document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('keyup', e=>{
+      if(e.key === 'Enter' || e.key === ' '){ btn.click(); }
+    }));
+  </script>
+</body>
+</html>
