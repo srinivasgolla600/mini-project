@@ -36,7 +36,7 @@ pipeline {
 
         stage('Deploy Container') {
             steps {
-                // Runs the new container on port 8080
+                // Runs the new container on port 8787
                 sh "docker run -d --name my-nginx-container -p 8787:80 ${DOCKER_IMAGE}:latest"
             }
         }
@@ -44,7 +44,7 @@ pipeline {
 
     post {
         success {
-            echo "Deployment successful! Access your site at http://your-jenkins-ip:8080"
+            echo "Deployment successful! Access your site at http://your-jenkins-ip:8787"
         }
         failure {
             echo "Deployment failed. Check the logs."
