@@ -3,141 +3,568 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Serene Tea — Menu</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Tea Time — Menu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:   #fdf6ec;
+      --warm:    #f5e6cc;
+      --brown:   #6b3f1f;
+      --dark:    #2c1a0e;
+      --gold:    #c8862a;
+      --accent:  #e07b39;
+      --muted:   #9e7f65;
+      --white:   #fff;
+      --shadow:  0 4px 24px rgba(44,26,14,.12);
+      --r:       14px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--dark);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,.3);
+    }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem;
+      color: var(--gold);
+      flex: 1;
+    }
+    header h1 span { color: var(--cream); font-style: italic; }
+    header .tagline {
+      font-size: .78rem;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    /* LAYOUT */
+    .app {
+      display: flex;
+      flex: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 28px 24px;
+      gap: 24px;
+    }
+
+    /* LEFT: MENU */
+    .menu-side { flex: 1; min-width: 0; }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+      align-items: center;
+    }
+    .controls input {
+      flex: 1;
+      min-width: 180px;
+      padding: 10px 16px;
+      border: 1.5px solid var(--warm);
+      border-radius: 50px;
+      background: var(--white);
+      font-family: inherit;
+      font-size: .9rem;
+      color: var(--dark);
+      outline: none;
+      transition: border-color .2s;
+    }
+    .controls input:focus { border-color: var(--gold); }
+
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter {
+      padding: 8px 18px;
+      border-radius: 50px;
+      border: 1.5px solid var(--warm);
+      background: var(--white);
+      font-family: inherit;
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .filter:hover { border-color: var(--gold); color: var(--gold); }
+    .filter.active { background: var(--brown); border-color: var(--brown); color: var(--white); }
+
+    /* MENU GRID */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+    }
+    .menu-item {
+      background: var(--white);
+      border-radius: var(--r);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform .22s, box-shadow .22s;
+      cursor: pointer;
+      position: relative;
+    }
+    .menu-item:hover { transform: translateY(-4px); box-shadow: 0 10px 32px rgba(44,26,14,.18); }
+    .menu-item img { width: 100%; height: 160px; object-fit: cover; display: block; transition: transform .35s; }
+    .menu-item:hover img { transform: scale(1.04); }
+    .menu-item .info { padding: 14px 16px 16px; }
+    .menu-item h3 { font-family: 'Playfair Display', serif; font-size: 1.05rem; margin-bottom: 5px; }
+    .menu-item p { font-size: .8rem; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+    .meta { display: flex; align-items: center; justify-content: space-between; }
+    .price { font-weight: 700; font-size: 1rem; color: var(--brown); }
+    .badge { font-size: .7rem; font-weight: 500; padding: 3px 10px; border-radius: 50px; text-transform: uppercase; letter-spacing: .8px; }
+    [data-cat="hot"]   .badge { background: #fdebd0; color: #b5521a; }
+    [data-cat="iced"]  .badge { background: #d6eaf8; color: #1a6b9a; }
+    [data-cat="snack"] .badge { background: #d5f5e3; color: #1e7a46; }
+
+    .add-btn {
+      position: absolute;
+      bottom: 52px;
+      right: 14px;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 10px rgba(224,123,57,.4);
+      transition: background .18s, transform .18s;
+    }
+    .add-btn:hover { background: var(--brown); transform: scale(1.12); }
+
+    /* RIGHT: ORDER PANEL */
+    .order-side { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; }
+
+    .token-machine {
+      background: var(--dark);
+      border-radius: var(--r);
+      padding: 20px;
+      color: var(--cream);
+      box-shadow: var(--shadow);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: var(--gold);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .token-display {
+      background: #1a0f07;
+      border: 1.5px solid var(--gold);
+      border-radius: 10px;
+      text-align: center;
+      padding: 14px 10px 10px;
+      margin-bottom: 16px;
+    }
+    .token-display .token-label { font-size: .65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .token-display .token-num { font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 700; color: var(--gold); line-height: 1; }
+
+    .order-list {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 280px;
+    }
+    .order-list::-webkit-scrollbar { width: 4px; }
+    .order-list::-webkit-scrollbar-thumb { background: var(--brown); border-radius: 4px; }
+
+    .order-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.06);
+      border-radius: 8px;
+      padding: 8px 10px;
+      animation: slideIn .2s ease;
+    }
+    @keyframes slideIn { from { opacity:0; transform:translateX(10px); } to { opacity:1; transform:translateX(0); } }
+
+    .order-row .item-name { flex: 1; font-size: .82rem; }
+    .qty-control { display: flex; align-items: center; gap: 6px; }
+    .qty-btn {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.2);
+      background: transparent;
+      color: var(--cream);
+      font-size: .9rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .qty-btn:hover { background: var(--brown); border-color: var(--brown); }
+    .qty-num { font-size: .85rem; font-weight: 600; color: var(--gold); min-width: 16px; text-align: center; }
+    .item-price { font-size: .8rem; color: var(--muted); min-width: 40px; text-align: right; }
+    .remove-btn { background: none; border: none; color: #c0392b; cursor: pointer; font-size: .9rem; opacity: .7; transition: opacity .15s; }
+    .remove-btn:hover { opacity: 1; }
+
+    .empty-order { text-align: center; color: rgba(255,255,255,.25); font-size: .82rem; padding: 24px 0; font-style: italic; }
+
+    .order-summary { border-top: 1px solid rgba(255,255,255,.1); padding-top: 12px; margin-bottom: 14px; }
+    .summary-row { display: flex; justify-content: space-between; font-size: .82rem; color: var(--muted); margin-bottom: 5px; }
+    .summary-row.total { font-size: .98rem; font-weight: 700; color: var(--gold); margin-top: 6px; }
+
+    .print-btn {
+      width: 100%; padding: 12px;
+      background: var(--gold);
+      color: var(--dark);
+      border: none;
+      border-radius: 10px;
+      font-family: 'Playfair Display', serif;
+      font-size: .95rem; font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .print-btn:hover { background: #e09a2f; transform: scale(1.02); }
+    .print-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+    .clear-btn {
+      width: 100%; padding: 9px; margin-top: 8px;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      font-family: inherit; font-size: .8rem;
+      cursor: pointer;
+      transition: color .2s, border-color .2s;
+    }
+    .clear-btn:hover { color: #e74c3c; border-color: #e74c3c; }
+
+    /* TICKET MODAL */
+    .ticket-wrap {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.55);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200;
+      backdrop-filter: blur(3px);
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s;
+    }
+    .ticket-wrap.show { opacity: 1; pointer-events: all; }
+
+    .ticket {
+      background: #fff;
+      width: 280px;
+      border-radius: 4px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+      font-family: 'Courier New', monospace;
+      overflow: hidden;
+      transform: scale(.85) translateY(20px);
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+    }
+    .ticket-wrap.show .ticket { transform: scale(1) translateY(0); }
+
+    .ticket-header { background: var(--dark); color: var(--gold); text-align: center; padding: 16px 12px 12px; }
+    .ticket-header h2 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 2px; }
+    .ticket-header p { font-size: .7rem; color: var(--muted); }
+
+    .ticket-body { padding: 14px 16px; border-bottom: 1px dashed #ccc; }
+    .ticket-token { text-align: center; font-size: 3rem; font-weight: 900; color: var(--brown); letter-spacing: 3px; margin: 8px 0; }
+    .ticket-sublabel { text-align: center; font-size: .65rem; letter-spacing: 2px; text-transform: uppercase; color: #999; margin-bottom: 14px; }
+    .ticket-items { font-size: .78rem; color: #333; }
+    .ticket-item-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dotted #eee; }
+    .ticket-total-row { display: flex; justify-content: space-between; padding: 8px 0 0; font-weight: 700; font-size: .85rem; }
+
+    .ticket-footer { padding: 12px 16px; text-align: center; font-size: .7rem; color: #999; }
+
+    .ticket-actions { display: flex; gap: 8px; padding: 0 16px 16px; }
+    .ticket-actions button { flex: 1; padding: 9px; border-radius: 6px; border: none; font-family: inherit; font-size: .8rem; cursor: pointer; font-weight: 600; }
+    .btn-print-real { background: var(--brown); color: #fff; }
+    .btn-close-ticket { background: #eee; color: #333; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: var(--dark); color: var(--gold);
+      padding: 10px 22px; border-radius: 50px;
+      font-size: .85rem; font-weight: 500;
+      box-shadow: 0 6px 24px rgba(0,0,0,.3);
+      transition: transform .3s, opacity .3s;
+      opacity: 0; pointer-events: none; z-index: 300;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    .site-footer { text-align: center; padding: 18px; font-size: .78rem; color: var(--muted); border-top: 1px solid var(--warm); }
+
+    @media (max-width: 780px) {
+      .app { flex-direction: column; padding: 16px; }
+      .order-side { width: 100%; }
+    }
+
+    @media print {
+      body > *:not(.ticket-wrap) { display: none; }
+      .ticket-wrap { position: static; background: none; opacity: 1; pointer-events: all; }
+      .ticket { box-shadow: none; }
+      .ticket-actions { display: none; }
+    }
+  </style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="container">
-      <h1>Tea  Time</h1>
-      <p class="tagline">Handcrafted teas & small snacks</p>
-    </div>
-  </header>
 
-  <main class="container">
-    <section class="controls">
-      <input id="search" type="search" placeholder="Search teas or snacks..." aria-label="Search menu" />
-      <div class="filters" role="tablist" aria-label="Filter categories">
+<header>
+  <div style="flex:1">
+    <h1>Tea <span>Time</span></h1>
+    <p class="tagline">Handcrafted teas &amp; small bites</p>
+  </div>
+</header>
+
+<div class="app">
+
+  <!-- LEFT: MENU -->
+  <div class="menu-side">
+    <div class="controls">
+      <input id="search" type="search" placeholder="Search teas or snacks…" aria-label="Search menu" />
+      <div class="filters" role="tablist">
         <button class="filter active" data-cat="all">All</button>
         <button class="filter" data-cat="hot">Hot Teas</button>
         <button class="filter" data-cat="iced">Iced Teas</button>
         <button class="filter" data-cat="snack">Snacks</button>
       </div>
-    </section>
+    </div>
+    <div id="menu" class="menu-grid" aria-live="polite"></div>
+  </div>
 
-    <section id="menu" class="menu-grid" aria-live="polite">
-
-      <div class="menu-item" data-cat="hot">
-        <img src="https://images.unsplash.com/photo-1523983254028-72d3d65b1d6a?auto=format&fit=crop&w=800&q=60" alt="Masala Chai in cup" />
-        <div class="info">
-          <h3>Masala Chai</h3>
-          <p>Black tea steeped with warming spices and milk.</p>
-          <div class="meta"><span class="price">$3.50</span><span class="badge">Hot</span></div>
-        </div>
+  <!-- RIGHT: ORDER PANEL -->
+  <div class="order-side">
+    <div class="token-machine">
+      <div class="panel-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 21v-4a4 4 0 018 0v4"/><circle cx="12" cy="10" r="3"/></svg>
+        Current Order
       </div>
 
-      <div class="menu-item" data-cat="hot">
-        <img src="https://images.unsplash.com/photo-1526318472351-c75fcf07026c?auto=format&fit=crop&w=800&q=60" alt="Earl Grey"/>
-        <div class="info">
-          <h3>Earl Grey</h3>
-          <p>Classic black tea scented with bergamot for citrusy notes.</p>
-          <div class="meta"><span class="price">$3.00</span><span class="badge">Hot</span></div>
-        </div>
+      <div class="token-display">
+        <div class="token-label">Next Token No.</div>
+        <div class="token-num" id="tokenNum">—</div>
       </div>
 
-      <div class="menu-item" data-cat="hot">
-        <img src="https://images.unsplash.com/photo-1518882573560-8f5341b30c5d?auto=format&fit=crop&w=800&q=60" alt="Matcha latte"/>
-        <div class="info">
-          <h3>Matcha Latte</h3>
-          <p>Ceremonial-grade matcha whisked with steamed milk.</p>
-          <div class="meta"><span class="price">$4.50</span><span class="badge">Hot</span></div>
-        </div>
+      <div class="order-list" id="orderList">
+        <div class="empty-order">No items added yet</div>
       </div>
 
-      <div class="menu-item" data-cat="iced">
-        <img src="https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=800&q=60" alt="Iced lemon tea"/>
-        <div class="info">
-          <h3>Iced Lemon Tea</h3>
-          <p>Refreshing black tea with a splash of lemon and ice.</p>
-          <div class="meta"><span class="price">$3.25</span><span class="badge">Iced</span></div>
-        </div>
+      <div class="order-summary" id="orderSummary" style="display:none">
+        <div class="summary-row"><span>Items</span><span id="sumItems">0</span></div>
+        <div class="summary-row"><span>Subtotal</span><span id="sumSub">$0.00</span></div>
+        <div class="summary-row total"><span>Total</span><span id="sumTotal">$0.00</span></div>
       </div>
 
-      <div class="menu-item" data-cat="iced">
-        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=60" alt="Iced matcha"/>
-        <div class="info">
-          <h3>Iced Matcha</h3>
-          <p>Cold, creamy matcha over ice.</p>
-          <div class="meta"><span class="price">$4.75</span><span class="badge">Iced</span></div>
-        </div>
+      <button class="print-btn" id="printBtn" disabled onclick="printToken()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print Token
+      </button>
+      <button class="clear-btn" onclick="clearOrder()">✕ Clear Order</button>
+    </div>
+  </div>
+</div>
+
+<!-- TICKET MODAL -->
+<div class="ticket-wrap" id="ticketModal" onclick="closeTicket(event)">
+  <div class="ticket">
+    <div class="ticket-header">
+      <h2>☕ Tea Time</h2>
+      <p>Handcrafted teas &amp; small bites</p>
+    </div>
+    <div class="ticket-body">
+      <div class="ticket-sublabel">Your Token Number</div>
+      <div class="ticket-token" id="ticketTokenNum">001</div>
+      <div class="ticket-sublabel" id="ticketDate"></div>
+      <div class="ticket-items" id="ticketItems"></div>
+      <div class="ticket-total-row">
+        <span>TOTAL</span>
+        <span id="ticketTotal"></span>
       </div>
+    </div>
+    <div class="ticket-footer">
+      Open daily • 8am – 6pm • 123 Tea Lane<br>
+      <small>Please show this token when collecting your order</small>
+    </div>
+    <div class="ticket-actions">
+      <button class="btn-print-real" onclick="window.print()">🖨 Print</button>
+      <button class="btn-close-ticket" onclick="closeTicket()">Close</button>
+    </div>
+  </div>
+</div>
 
-      <div class="menu-item" data-cat="snack">
-        <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=800&q=60" alt="Butter cookie"/>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<footer class="site-footer">Open daily • 8am – 6pm • 123 Tea Lane</footer>
+
+<script>
+  const menuData = [
+    { id:1, name:'Masala Chai',        cat:'hot',   price:3.50, desc:'Black tea steeped with warming spices and milk.',    img:'https://images.unsplash.com/photo-1523983254028-72d3d65b1d6a?auto=format&fit=crop&w=800&q=60' },
+    { id:2, name:'Earl Grey',          cat:'hot',   price:3.00, desc:'Classic black tea scented with bergamot.',           img:'https://images.unsplash.com/photo-1526318472351-c75fcf07026c?auto=format&fit=crop&w=800&q=60' },
+    { id:3, name:'Matcha Latte',       cat:'hot',   price:4.50, desc:'Ceremonial-grade matcha whisked with steamed milk.', img:'https://images.unsplash.com/photo-1518882573560-8f5341b30c5d?auto=format&fit=crop&w=800&q=60' },
+    { id:4, name:'Chamomile',          cat:'hot',   price:3.00, desc:'Calming herbal infusion, caffeine-free.',            img:'https://images.unsplash.com/photo-1528821154947-1aa3e4d3d6d0?auto=format&fit=crop&w=800&q=60' },
+    { id:5, name:'Iced Lemon Tea',     cat:'iced',  price:3.25, desc:'Refreshing black tea with lemon and ice.',           img:'https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=800&q=60' },
+    { id:6, name:'Iced Matcha',        cat:'iced',  price:4.75, desc:'Cold, creamy matcha over ice.',                     img:'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=60' },
+    { id:7, name:'Buttery Shortbread', cat:'snack', price:2.75, desc:'House-baked crisp shortbread with vanilla.',        img:'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=800&q=60' },
+    { id:8, name:'Blueberry Scone',    cat:'snack', price:3.00, desc:'Light flaky scone packed with blueberries.',        img:'https://images.unsplash.com/photo-1604908177522-8b16f2c1f4f8?auto=format&fit=crop&w=800&q=60' },
+  ];
+
+  let order = {};
+  let tokenCounter = parseInt(localStorage.getItem('teatime_token') || '0');
+
+  function renderMenu(cat='all', query='') {
+    const grid = document.getElementById('menu');
+    const q = query.trim().toLowerCase();
+    const filtered = menuData.filter(item => {
+      const matchCat   = cat === 'all' || item.cat === cat;
+      const matchQuery = q === '' || (item.name + item.desc).toLowerCase().includes(q);
+      return matchCat && matchQuery;
+    });
+    grid.innerHTML = filtered.map(item => `
+      <div class="menu-item" data-cat="${item.cat}" onclick="addItem(${item.id})">
+        <img src="${item.img}" alt="${item.name}" loading="lazy" />
         <div class="info">
-          <h3>Buttery Shortbread</h3>
-          <p>House-baked, crisp shortbread with vanilla.</p>
-          <div class="meta"><span class="price">$2.75</span><span class="badge">Snack</span></div>
+          <h3>${item.name}</h3>
+          <p>${item.desc}</p>
+          <div class="meta">
+            <span class="price">$${item.price.toFixed(2)}</span>
+            <span class="badge">${item.cat==='hot'?'Hot':item.cat==='iced'?'Iced':'Snack'}</span>
+          </div>
         </div>
+        <button class="add-btn" onclick="event.stopPropagation();addItem(${item.id})" aria-label="Add ${item.name}">+</button>
       </div>
+    `).join('') || '<p style="color:var(--muted);padding:20px">No items found.</p>';
+  }
 
-      <div class="menu-item" data-cat="snack">
-        <img src="https://images.unsplash.com/photo-1604908177522-8b16f2c1f4f8?auto=format&fit=crop&w=800&q=60" alt="Scone"/>
-        <div class="info">
-          <h3>Blueberry Scone</h3>
-          <p>Light, flaky scone packed with blueberries.</p>
-          <div class="meta"><span class="price">$3.00</span><span class="badge">Snack</span></div>
-        </div>
-      </div>
+  function addItem(id) {
+    order[id] = (order[id] || 0) + 1;
+    renderOrder();
+    showToast(menuData.find(i=>i.id===id).name + ' added ✓');
+  }
 
-      <div class="menu-item" data-cat="hot">
-        <img src="https://images.unsplash.com/photo-1528821154947-1aa3e4d3d6d0?auto=format&fit=crop&w=800&q=60" alt="Herbal infusion"/>
-        <div class="info">
-          <h3>Chamomile</h3>
-          <p>Calming herbal infusion, naturally caffeine-free.</p>
-          <div class="meta"><span class="price">$3.00</span><span class="badge">Hot</span></div>
-        </div>
-      </div>
+  function changeQty(id, delta) {
+    order[id] = (order[id] || 0) + delta;
+    if (order[id] <= 0) delete order[id];
+    renderOrder();
+  }
 
-    </section>
+  function removeItem(id) { delete order[id]; renderOrder(); }
+  function clearOrder()   { order = {}; renderOrder(); }
 
-    <p class="footer">Open daily • 8am – 6pm • 123 Tea Lane</p>
+  function renderOrder() {
+    const list     = document.getElementById('orderList');
+    const summary  = document.getElementById('orderSummary');
+    const printBtn = document.getElementById('printBtn');
+    const ids = Object.keys(order).map(Number);
 
-  </main>
-
-  <script>
-    // Simple client-side filter + search
-    const filters = document.querySelectorAll('.filter');
-    const items = Array.from(document.querySelectorAll('.menu-item'));
-    const search = document.getElementById('search');
-
-    function applyFilter(category, query=''){
-      const q = query.trim().toLowerCase();
-      items.forEach(it=>{
-        const matchesCat = category === 'all' || it.dataset.cat === category;
-        const text = (it.querySelector('h3').textContent + ' ' + it.querySelector('p').textContent).toLowerCase();
-        const matchesQuery = q === '' || text.includes(q);
-        it.style.display = (matchesCat && matchesQuery) ? '' : 'none';
-      });
+    if (!ids.length) {
+      list.innerHTML = '<div class="empty-order">No items added yet</div>';
+      summary.style.display = 'none';
+      printBtn.disabled = true;
+      document.getElementById('tokenNum').textContent = '—';
+      return;
     }
 
-    filters.forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        filters.forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        applyFilter(btn.dataset.cat, search.value);
-      });
-    });
+    let totalQty=0, subtotal=0;
+    list.innerHTML = ids.map(id => {
+      const item = menuData.find(i=>i.id===id);
+      const qty  = order[id];
+      totalQty += qty; subtotal += item.price * qty;
+      return `
+        <div class="order-row">
+          <span class="item-name">${item.name}</span>
+          <div class="qty-control">
+            <button class="qty-btn" onclick="changeQty(${id},-1)">−</button>
+            <span class="qty-num">${qty}</span>
+            <button class="qty-btn" onclick="changeQty(${id},+1)">+</button>
+          </div>
+          <span class="item-price">$${(item.price*qty).toFixed(2)}</span>
+          <button class="remove-btn" onclick="removeItem(${id})">✕</button>
+        </div>`;
+    }).join('');
 
-    search.addEventListener('input', ()=>{
-      const active = document.querySelector('.filter.active').dataset.cat;
-      applyFilter(active, search.value);
-    });
+    document.getElementById('sumItems').textContent = totalQty;
+    document.getElementById('sumSub').textContent   = '$'+subtotal.toFixed(2);
+    document.getElementById('sumTotal').textContent = '$'+subtotal.toFixed(2);
+    summary.style.display = 'block';
+    printBtn.disabled = false;
+    document.getElementById('tokenNum').textContent = String(tokenCounter+1).padStart(3,'0');
+  }
 
-    // keyboard accessibility for filters
-    document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('keyup', e=>{
-      if(e.key === 'Enter' || e.key === ' '){ btn.click(); }
-    }));
-  </script>
+  function printToken() {
+    if (!Object.keys(order).length) return;
+    tokenCounter++;
+    localStorage.setItem('teatime_token', tokenCounter);
+
+    const ids = Object.keys(order).map(Number);
+    let subtotal = 0;
+    const rows = ids.map(id => {
+      const item = menuData.find(i=>i.id===id);
+      const qty  = order[id];
+      subtotal += item.price * qty;
+      return `<div class="ticket-item-row"><span>${item.name} × ${qty}</span><span>$${(item.price*qty).toFixed(2)}</span></div>`;
+    }).join('');
+
+    document.getElementById('ticketTokenNum').textContent = String(tokenCounter).padStart(3,'0');
+    document.getElementById('ticketDate').textContent     = new Date().toLocaleString();
+    document.getElementById('ticketItems').innerHTML      = rows;
+    document.getElementById('ticketTotal').textContent    = '$'+subtotal.toFixed(2);
+    document.getElementById('ticketModal').classList.add('show');
+  }
+
+  function closeTicket(e) {
+    if (!e || e.target === document.getElementById('ticketModal')) {
+      document.getElementById('ticketModal').classList.remove('show');
+      clearOrder();
+    }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(()=>t.classList.remove('show'), 1800);
+  }
+
+  let activeCat = 'all';
+  document.querySelectorAll('.filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCat = btn.dataset.cat;
+      renderMenu(activeCat, document.getElementById('search').value);
+    });
+  });
+  document.getElementById('search').addEventListener('input', e => renderMenu(activeCat, e.target.value));
+
+  renderMenu();
+</script>
 </body>
 </html>
